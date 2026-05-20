@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 591316258315.dkr.ecr.ap-southeast-2.amazonaws.com
+  build:
+    commands:
+      - docker build -t poc24-app .
+      - docker tag poc24-app:latest 591316258315.dkr.ecr.ap-southeast-2.amazonaws.com/poc24-repo:latest
+  post_build:
+    commands:
+      - docker push 591316258315.dkr.ecr.ap-southeast-2.amazonaws.com/poc24-repo:latest
+      - printf '[{"name":"poc24-container","imageUri":"591316258315.dkr.ecr.ap-southeast-2.amazonaws.com/poc24-repo:latest"}]' > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
